@@ -100,7 +100,7 @@ outputFilePath = 'comic-script.csv'
 rootDir = ''
 
 # initialize output file
-with open(outputFilePath, 'w',newline="") as f:
+with open(outputFilePath, 'w',newline = "") as f:
     writer = csv.writer(f)
     writer.writerow(['filePath', 'script'])
 
@@ -119,8 +119,8 @@ for imagePath in looper(rootDir):
         # denoise
         croppedImage = denoise(croppedImage, 2)
         kernel = np.ones((1, 1), np.uint8)
-        croppedImage = cv2.dilate(croppedImage, kernel, iterations=50)
-        croppedImage = cv2.erode(croppedImage, kernel, iterations=50)
+        croppedImage = cv2.dilate(croppedImage, kernel, iterations = 50)
+        croppedImage = cv2.erode(croppedImage, kernel, iterations = 50)
 
         # turn gray
         croppedImageGray = cv2.cvtColor(croppedImage, cv2.COLOR_BGR2GRAY)
