@@ -1,17 +1,17 @@
+##################################################
+#                 import modules                 #
+##################################################
 import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 import pytesseract
-from PIL import Image
-from PIL import ImageEnhance
-from PIL import ImageFilter
 import os
-import zipfile
 import csv
-import scipy.misc
-import numpy as np
 
-# finds all speech bubbles in the given comic page and returns a list of cropped speech bubbles (with possible false positives)
+##################################################
+#                helper functions                #
+##################################################
+# find all speech bubbles in the given comic page and return a list of cropped speech bubbles (with possible false positives)
 def findSpeechBubbles(imagePath, method = 'simple'):
     # read image
     image = cv2.imread(imagePath)
@@ -22,34 +22,40 @@ def findSpeechBubbles(imagePath, method = 'simple'):
     if method != 'simple':
         # recognizes more complex bubble shapes
         imageGrayBlurCanny = cv2.Canny(imageGrayBlur,50,500)
-        ret, binary = cv2.threshold(imageGrayBlurCanny,235,255,cv2.THRESH_BINARY)
+        binary = cv2.threshold(imageGrayBlurCanny,235,255,cv2.THRESH_BINARY)[1]
     else:
         # recognizes only rectangular bubbles
-        ret, binary = cv2.threshold(imageGrayBlur,235,255,cv2.THRESH_BINARY)
-    
-    binary, contours, hierarchy = cv2.findContours(binary,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-
+        binary = cv2.threshold(imageGrayBlur,235,255,cv2.THRESH_BINARY)[1]
+    # find contours
+    contours = cv2.findContours(binary,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)[1]
+    # get the list of cropped speech bubbles
     croppedImageList = []
     for contour in contours:
         rect = cv2.boundingRect(contour)
         [x, y, w, h] = rect
+        # filter out speech bubble candidates with unreasonable size
         if w < 500 and w > 60 and h < 500 and h > 25:
+            # uncomment to view the contour rectangles that are detected
+            # cv2.rectangle(image, (x,y), (w+x,h+y), (0,255,0), 2)
             croppedImage = image[y:y+h, x:x+w]
             croppedImageList.append(croppedImage)
+    
+    # uncomment to view the contour rectangles that are detected
+    # cv2.imshow("img", image)
+    # cv2.waitKey(0)
 
     return croppedImageList
 
-# function that applies the ocr engine to the given image and returns the recognized script where illegitimate characters are filtered out
+# apply the ocr engine to the given image and return the recognized script where illegitimate characters are filtered out
 def tesseract(image):
-    script = pytesseract.image_to_string(image, lang='eng')
-    #print(script)
+    script = pytesseract.image_to_string(image, lang = 'eng')
     for char in script:
         if char not in ' -QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm,.?!1234567890"":;\'':
             script = script.replace(char,'')
     
     return script
 
-# function that loops thru each file in the given directory, not including zip files
+# loop through each file in the given directory, not including zip files
 def looper(rootDir):
     fileNameList = []
     filePathList = []
@@ -63,20 +69,10 @@ def looper(rootDir):
                 if fileName not in fileNameList:
                     fileNameList.append(fileName)
                     filePathList.append(filePath)
-            # else:
-            #     z = zipfile.ZipFile(file, 'r')
-            #     zippedFileList = z.namelist()
-            #     for zippedFile in zippedFileList:
-            #         zippedFileInfo = zippedFile.split('.')
-            #         zippedFileName, zippedFileExten = zippedFileInfo[0], zippedFileInfo[-1]
-            #         zippedFilePath = os.path.join(subDir, file, zippedFile)
-            #         if zippedFileName not in fileNameList:
-            #             fileNameList.append(zippedFileName)
-            #             filePathList.append(zippedFilePath)
-    
+
     return filePathList
 
-# function that denoises the given image with n iterations
+# denoise the given image with n iterations
 def denoise(image, n):
     i = 0
     while i < n:
@@ -85,19 +81,25 @@ def denoise(image, n):
 
     return image 
 
-# function that appends image path and script to the output csv file
+# append image path and script to the output csv file
 def write_script_to_csv(imagePath, script, outputFilePath):
-    with open(outputFilePath, 'a', encoding="utf-8", newline="") as f:
+    with open(outputFilePath, 'a', encoding = "utf-8", newline = "") as f:
         writer = csv.writer(f)
         newRow = [imagePath, script]
         writer.writerow(newRow)
 
-# output file path and directory to be looped thru
-outputFilePath = 'E:\\Fun\\TFComicScript.csv'
-rootDir = 'E:\\Fun\\Transformers Comics folders'
-#rootDir = 'E:\\Fun\\Programming\\For fun\\test'
+##################################################
+#                   main work                    #
+##################################################
+# set working directory
+path = ""
+os.chdir(path)
 
-# initializes output file
+# output file path and directory to be looped through
+outputFilePath = 'comic-script.csv'
+rootDir = ''
+
+# initialize output file
 with open(outputFilePath, 'w',newline="") as f:
     writer = csv.writer(f)
     writer.writerow(['filePath', 'script'])
@@ -113,7 +115,7 @@ for imagePath in looper(rootDir):
     scriptList = []
     for croppedImage in croppedImageList:
         # enlarge
-        croppedImage = cv2.resize(croppedImage, (0,0), fx=2, fy=2)
+        croppedImage = cv2.resize(croppedImage, (0,0), fx = 2, fy = 2)
         # denoise
         croppedImage = denoise(croppedImage, 2)
         kernel = np.ones((1, 1), np.uint8)
