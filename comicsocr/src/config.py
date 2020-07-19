@@ -15,7 +15,7 @@ class Config:
                      'height': [25,
                                 500]
                  },
-                 show=True,
+                 show=False,
                  showWindowSize={'height': 768},
                  charsAllowed=' -QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm,.?!1234567890"":;\'',
                  method=None):

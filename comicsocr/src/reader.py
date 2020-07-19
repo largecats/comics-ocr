@@ -64,9 +64,11 @@ class Reader:
             # adjust contrast and brightness
             tokenGrayBlurLaplacian = np.uint8(np.clip((10 * tokenGrayBlurLaplacian + 10), 0, 255))
             script = pytesseract.image_to_string(tokenGrayBlurLaplacian, lang='eng')
+            if len(script) == 0 or script.isspace():
+                continue
             for char in script:  # remove illegitimate characters
                 if char not in self.config.charsAllowed:
                     script = script.replace(char, '')
-            logger.info(script)
+            logger.info(repr(script))
             scripts.append(script)
         return scripts

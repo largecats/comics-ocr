@@ -47,16 +47,22 @@ def main(argv):
     outputPath = args['output_path']
     if config:
         for path in paths:
+            name, extension = os.path.splitext(path)
             if os.path.isdir(path):
-                api.read_from_folder(folderPath=path, outputPath=outputPath, config=config)
-            else:
+                api.read_from_directory(directory=path, outputPath=outputPath, config=config)
+            elif extension in api.IMAGE_EXTENSIONS:
                 api.read_from_file(imagePath=path, outputPath=outputPath, config=config)
+            elif extension in api.ARCHIVE_EXTENSIONS:
+                api.read_from_archive_file(path=path, outputPath=outputPath, config=config)
     else:
         for path in paths:
+            name, extension = os.path.splitext(path)
             if os.path.isdir(path):
-                api.read_from_folder(folderPath=path, outputPath=outputPath)
-            else:
+                api.read_from_directory(directory=path, outputPath=outputPath)
+            elif extension in api.IMAGE_EXTENSIONS:
                 api.read_from_file(imagePath=path, outputPath=outputPath)
+            elif extension in api.ARCHIVE_EXTENSIONS:
+                api.read_from_archive_file(path=path, outputPath=outputPath)
 
 
 def get_arguments(argv):
@@ -75,7 +81,7 @@ def get_arguments(argv):
     parser.add_argument('--paths',
                         type=str,
                         nargs='+',
-                        help='Paths to comic image files or folders containing comic image files.')
+                        help='Paths to comic image files or directorys containing comic image files.')
 
     parser.add_argument('--output-path', type=str, help='Path to write the comic scripts to.')
 

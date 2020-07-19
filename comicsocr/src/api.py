@@ -3,10 +3,21 @@ import os
 import csv
 import configparser
 import ast
+import patoolib
+import logging
+import subprocess
+import ntpath
 
 from comicsocr.src.config import Config, DEFAULT_CONFIG_SECTION
 from comicsocr.src.tokenizer import Tokenizer
 from comicsocr.src.reader import Reader
+
+logger = logging.getLogger(__name__)
+log_formatter = '[%(asctime)s] %(levelname)s [%(filename)s:%(lineno)s:%(funcName)s] %(message)s'
+logging.basicConfig(stream=sys.stdout, level=logging.INFO, format=log_formatter)
+
+IMAGE_EXTENSIONS = ['.jpg', '.png', '.bmp']
+ARCHIVE_EXTENSIONS = ['.rar', '.cbr', '.zip']
 
 
 def read_from_file(imagePath, outputPath=None, config=Config()):
@@ -16,11 +27,12 @@ def read_from_file(imagePath, outputPath=None, config=Config()):
         if type(config) == str:
             if config.startswith('{'):  # config is a dictionary in string
                 config = eval(config)
-                reader = Reader(config=_create_config_from_dict(config))
+                reader = Reader(config=_create_config_from_dict(configDict=config))
         elif type(config) == dict:  # config is a dictionary
-            reader = Reader(config=_create_config_from_dict(config))
+            reader = Reader(config=_create_config_from_dict(configDict=config))
         else:
             raise Exception('Unsupported config type')
+    logger.info('Reading from file: ' + imagePath)
     script = reader.read(imagePath=imagePath)
     if outputPath:
         write_to_csv(imagePath=imagePath, script=script, outputPath=outputPath)
@@ -32,6 +44,7 @@ def write_to_csv(imagePath, script, outputPath):
     '''
     Write file path and extracted comic script to given output path.
     '''
+    logger.info('Writing to: ' + outputPath)
     with open(outputPath, 'a', encoding="utf-8", newline="") as f:
         writer = csv.writer(f)
         for line in script:
@@ -39,31 +52,48 @@ def write_to_csv(imagePath, script, outputPath):
             writer.writerow(newRow)
 
 
-def read_from_archive_file():
-    pass
-
-
-def read_from_folder(folderPath, outputPath=None, config=Config()):
-    '''
-    Read script from all image files in given folder recursively.
-    '''
-    results = {}
-    for subDir, dirs, files in os.walk(folderPath):
-        for file in files:
-            fileInfo = file.split('.')
-            fileName, fileExten = fileInfo[0], fileInfo[-1]
-            imagePath = os.path.join(subDir, file)
-            if fileExten in ['jpg', 'png', 'bmp']:
-                script = read_from_file(imagePath=imagePath, config=config)
-                results[imagePath] = script
-            elif fileExten in ['rar', 'cbr', 'zip']:
-                scripts = read_from_archive_file(imagePath=imagePath, config=config)
-                for tarimagePath, script in scripts:
-                    results[tarimagePath] = script
+def read_from_archive_file(path, outputPath=None, config=Config()):
+    logger.info('Reading from archive file: ' + path)
+    patoolib.test_archive(path, verbosity=1)  # test integrity of archive
+    parentDir = os.path.dirname(path)
+    tempDir = os.path.join(parentDir, 'tmp')
+    logger.info('Extracting from ' + path + ' to ' + tempDir)
+    patoolib.list_archive(path)
+    subprocess.call('mkdir -p "%s"' % tempDir, shell=True)  # create temporary directory
+    patoolib.extract_archive(path, outdir=tempDir)  # extract archive files to temporary directory
+    results = read_from_directory(directory=tempDir, config=config)
     if outputPath:
-        for imagePath, script in results.items():
+        for imageTempPath, script in results.items():
+            imagePath = path + '/' + _get_file_name(path=imageTempPath)
             write_to_csv(imagePath=imagePath, script=script, outputPath=outputPath)
-    return imagePath
+    logger.info('Removing temporary directory: ' + tempDir)
+    subprocess.call('rm -rf "%s"' % tempDir, shell=True)  # remove temporary directory
+    return results
+
+
+def _get_file_name(path):
+    # from https://stackoverflow.com/questions/8384737/extract-file-name-from-path-no-matter-what-the-os-path-format
+    head, tail = ntpath.split(path)
+    return tail or ntpath.basename(head)
+
+
+def read_from_directory(directory, outputPath=None, config=Config()):
+    '''
+    Read script from all image files in given directory recursively.
+    '''
+    logger.info('Reading from directory: ' + directory)
+    results = {}
+    for subDir, dirs, files in os.walk(directory):
+        for file in files:
+            fileName, fileExten = os.path.splitext(file)
+            imagePath = os.path.join(subDir, file)
+            if fileExten in IMAGE_EXTENSIONS:
+                script = read_from_file(imagePath=imagePath, outputPath=outputPath, config=config)
+                results[imagePath] = script
+            elif fileExten in ARCHIVE_EXTENSIONS:
+                archiveFileResults = read_from_archive_file(path=imagePath, outputPath=outputPath, config=config)
+                results.update(archiveFileResults)
+    return results
 
 
 def _create_config_from_dict(configDict, defaultConfigSection=DEFAULT_CONFIG_SECTION):
