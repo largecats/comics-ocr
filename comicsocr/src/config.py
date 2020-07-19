@@ -26,17 +26,19 @@ class Config:
             Default to {'width': [60, 500],'height': [25, 500]}.
         charsAllowed: string
             Legitimate characters when reading from image.
+            Default to ' -QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm,.?!1234567890"":;\''.
         method: string
             Config.SIMPLE - recognizes only rectangular bubbles.
             Config.COMPLEX - recognizes more complex bubble shapes.
-        denoiseIterations: int
-            Number of iterations to denoise the image with before applying the OCR engine.
-            Default to 2.
+            Default to Config.SIMPLE.
         show: boolean
             If True, will show the image being processed with recognized contours.
+            Note: This feature may require special handling on unix systems.
+            Default to False.
         showWindowSize: dict
             Size of the window when displaying the image being processed. 
-            E.g., {'height': 768} means scale the image to height 768 with the same aspect ratio. Default to {'height': 768}.
+            E.g., {'height': 768} means scale the image to height 768 with the same aspect ratio. 
+            Default to {'height': 768}.
         '''
         self.speechBubbleSize = speechBubbleSize
         self.charsAllowed = charsAllowed

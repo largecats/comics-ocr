@@ -9,7 +9,7 @@ setuptools.setup(
     author='largecats',
     author_email='linfanxiaolinda@outlook.com',
     description=
-    'A tool for extracting script from comic pages.',
+    'A tool for extracting script from comic pages using OCR engine Tesseract.',
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/largecats/comics-ocr',
