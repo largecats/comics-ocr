@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 log_formatter = '[%(asctime)s] %(levelname)s [%(filename)s:%(lineno)s:%(funcName)s] %(message)s'
 logging.basicConfig(stream=sys.stdout, level=logging.INFO, format=log_formatter)
 
-IMAGE_EXTENSIONS = ['.jpg', '.png', '.bmp']
+IMAGE_EXTENSIONS = ['.jpg', '.png', '.bmp', '.tiff']
 ARCHIVE_EXTENSIONS = ['.rar', '.cbr', '.zip']
 
 
