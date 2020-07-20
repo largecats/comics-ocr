@@ -54,18 +54,18 @@ def read_from_file(imagePath, outputPath=None, config=Config()):
     logger.info('Reading from file: ' + imagePath)
     script = reader.read(imagePath=imagePath)
     if outputPath:
-        write_to_csv(imagePath=imagePath, script=script, outputPath=outputPath)
+        write_to_file(imagePath=imagePath, script=script, outputPath=outputPath)
     else:
         return script
 
 
-def write_to_csv(imagePath, script, outputPath):
+def write_to_file(imagePath, script, outputPath):
     '''
     Write file path and extracted comic script to given output path.
 
     Parameters
     imagePath: string
-        Path to the image file.
+        Path to the image file. Recommended format is .csv.
     script: list
         List of extract scripts.
     outputPath: string
@@ -113,7 +113,7 @@ def read_from_archive_file(path, outputPath=None, config=Config()):
     if outputPath:
         for imageTempPath, script in results.items():
             imagePath = path + '/' + _get_file_name(path=imageTempPath)
-            write_to_csv(imagePath=imagePath, script=script, outputPath=outputPath)
+            write_to_file(imagePath=imagePath, script=script, outputPath=outputPath)
     else:
         return results
 
@@ -161,7 +161,7 @@ def read_from_directory(directory, outputPath=None, config=Config()):
                 results.update(archiveFileResults)
     if outputPath:
         for imagePath, script in results.items():
-            write_to_csv(imagePath=imagePath, script=script, outputPath=outputPath)
+            write_to_file(imagePath=imagePath, script=script, outputPath=outputPath)
     else:
         return results
 
