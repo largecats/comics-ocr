@@ -21,6 +21,25 @@ ARCHIVE_EXTENSIONS = ['.rar', '.cbr', '.zip']
 
 
 def read_from_file(imagePath, outputPath=None, config=Config()):
+    '''
+    Extract script from given comic image file.
+
+    Parameters
+    imagePath: string
+        Path to the image file. 
+        Supported formats: ['.jpg', '.png', '.bmp', '.tiff']
+    outputPath: string or None
+        If not None, will write the extracted script to this path.
+        Else, will return the extracted script.
+    config: comicsocr.src.config.Config() object
+        Configurations.
+    
+    Return: None or list
+        If outputPath is not None, return the list of extracted scripts.
+    '''
+    fileName, fileExten = os.path.splitext(imagePath)
+    if fileExten not in IMAGE_EXTENSIONS:
+        raise Exception('Unsupported image file format: ' + fileExten)
     if type(config) == type(Config()):  # config is a Config() object
         reader = Reader(config=config)
     else:  # create Config() object from config
@@ -35,14 +54,22 @@ def read_from_file(imagePath, outputPath=None, config=Config()):
     logger.info('Reading from file: ' + imagePath)
     script = reader.read(imagePath=imagePath)
     if outputPath:
-        write_to_csv(imagePath=imagePath, script=script, outputPath=outputPath)
+        write_to_file(imagePath=imagePath, script=script, outputPath=outputPath)
     else:
         return script
 
 
-def write_to_csv(imagePath, script, outputPath):
+def write_to_file(imagePath, script, outputPath):
     '''
     Write file path and extracted comic script to given output path.
+
+    Parameters
+    imagePath: string
+        Path to the image file. Recommended format is .csv.
+    script: list
+        List of extract scripts.
+    outputPath: string
+        Path to write to.
     '''
     logger.info('Writing to: ' + outputPath)
     with open(outputPath, 'a', encoding="utf-8", newline="") as f:
@@ -53,6 +80,25 @@ def write_to_csv(imagePath, script, outputPath):
 
 
 def read_from_archive_file(path, outputPath=None, config=Config()):
+    '''
+    Extract script from all image files in given archive file.
+
+    Paramters
+    path: string
+        Path to the archive file.
+        Supported formats: ['.rar', '.cbr', '.zip']
+    outputPath: string or None
+        If not None, will write the extracted script to this path.
+        Else, will return the extracted script.
+    config: comicsocr.src.config.Config() object
+        Configurations.
+    
+    Return: None or dict
+        If outputPath is not None, return a dictionary of comic page paths and scripts extracted from each page.
+    '''
+    fileName, fileExten = os.path.splitext(path)
+    if fileExten not in ARCHIVE_EXTENSIONS:
+        raise Exception('Unsupported archive file format: ' + fileExten)
     logger.info('Reading from archive file: ' + path)
     patoolib.test_archive(path, verbosity=1)  # test integrity of archive
     parentDir = os.path.dirname(path)
@@ -62,16 +108,24 @@ def read_from_archive_file(path, outputPath=None, config=Config()):
     subprocess.call('mkdir -p "%s"' % tempDir, shell=True)  # create temporary directory
     patoolib.extract_archive(path, outdir=tempDir)  # extract archive files to temporary directory
     results = read_from_directory(directory=tempDir, config=config)
+    logger.info('Removing temporary directory: ' + tempDir)
+    subprocess.call('rm -rf "%s"' % tempDir, shell=True)  # remove temporary directory
     if outputPath:
         for imageTempPath, script in results.items():
             imagePath = path + '/' + _get_file_name(path=imageTempPath)
-            write_to_csv(imagePath=imagePath, script=script, outputPath=outputPath)
-    logger.info('Removing temporary directory: ' + tempDir)
-    subprocess.call('rm -rf "%s"' % tempDir, shell=True)  # remove temporary directory
-    return results
+            write_to_file(imagePath=imagePath, script=script, outputPath=outputPath)
+    else:
+        return results
 
 
 def _get_file_name(path):
+    '''
+    Get the base name of given file.
+
+    Parameters
+    path: string
+        Path to file.
+    '''
     # from https://stackoverflow.com/questions/8384737/extract-file-name-from-path-no-matter-what-the-os-path-format
     head, tail = ntpath.split(path)
     return tail or ntpath.basename(head)
@@ -79,7 +133,19 @@ def _get_file_name(path):
 
 def read_from_directory(directory, outputPath=None, config=Config()):
     '''
-    Read script from all image files in given directory recursively.
+    Read script from all image files or archive files of images in given directory recursively.
+
+    Parameters
+    directory: string
+        Directory to read from.
+    outputPath: string or None
+        If not None, will write the extracted script to this path.
+        Else, will return the extracted script.
+    config: comicsocr.src.config.Config() object
+        Configurations.
+    
+    Return: None or dict
+        If outputPath is not None, return a dictionary of comic page paths and scripts extracted from each page.
     '''
     logger.info('Reading from directory: ' + directory)
     results = {}
@@ -93,7 +159,11 @@ def read_from_directory(directory, outputPath=None, config=Config()):
             elif fileExten in ARCHIVE_EXTENSIONS:
                 archiveFileResults = read_from_archive_file(path=imagePath, outputPath=outputPath, config=config)
                 results.update(archiveFileResults)
-    return results
+    if outputPath:
+        for imagePath, script in results.items():
+            write_to_file(imagePath=imagePath, script=script, outputPath=outputPath)
+    else:
+        return results
 
 
 def _create_config_from_dict(configDict, defaultConfigSection=DEFAULT_CONFIG_SECTION):

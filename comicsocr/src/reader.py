@@ -36,14 +36,14 @@ class Reader:
 
     def read(self, imagePath):
         '''
-        Apply the ocr engine to the given image and return the recognized scripts where illegitimate characters are filtered out.
+        Apply the ocr engine to the given image and return the extracted scripts where illegitimate characters are filtered out.
 
         Parameters
         imagePath: string
             Path to the comic page image.
         
         Return: list
-            Strings of comic script recognized from the image.
+            Strings of comic script extracted from the image.
         '''
         tokens = self.tokenizer.tokenize(imagePath=imagePath)
         scripts = []

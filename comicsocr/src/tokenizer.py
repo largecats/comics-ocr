@@ -33,6 +33,7 @@ class Tokenizer:
             Path to the comic page image.
         show: boolean
             If true, will show contour rectangles detected while running.
+            Note: May not be available in Python's interactive terminal and may require special handling to show on Unix systems.
         
         Return: list
             Cropped speech bubbles (with possible false positives).
