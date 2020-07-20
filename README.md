@@ -1,9 +1,7 @@
 # comics-ocr
 Tool for extracting script from comic pages using OCR engine Tesseract. Inspired by motion comic [Rewind's last message](https://www.youtube.com/watch?v=1LBFR90f6rg) (or alternative link [here](https://www.bilibili.com/video/av2786047)). Useful for making something like [page 18~19 of The Transformers: More than Meets the Eye #16](https://www.transformers.kiev.ua/index.php?pageid=idw) (or alternative link in Chinese [here](http://www.tfg2.com/read.php?tid-45122.html)). 
 
-* Supports image file formats `.jpg`, `.png`. `.bmp`, `.tiff` formats on Windows and Unix systems. 
-* Supports archive file formats `.rar`, `.cbr`, `.zip` on Unix systems.
-* The OCR engine Tesseract that is used is not trained, but it can be if needed.
+Supports image file formats `.jpg`, `.png`. `.bmp`, `.tiff` formats on Windows and Unix systems. Supports archive file formats `.rar`, `.cbr`, `.zip` on Unix systems. The OCR engine Tesseract that is used is not trained, but can be if needed.
 
 - [comics-ocr](#comics-ocr)
 - [Prerequisites](#prerequisites)
