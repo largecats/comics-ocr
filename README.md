@@ -4,7 +4,6 @@ Tool for extracting script from comic pages using OCR engine Tesseract. Inspired
 * Supports image file formats `.jpg`, `.png`. `.bmp`, `.tiff` formats on Windows and Unix systems. 
 * Supports archive file formats `.rar`, `.cbr`, `.zip` on Unix systems.
 * The OCR engine Tesseract that is used is not trained, but it can be if needed.
-* 
 
 - [comics-ocr](#comics-ocr)
 - [Prerequisites](#prerequisites)
