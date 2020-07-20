@@ -9,7 +9,7 @@ Tool for extracting script from comic pages using OCR engine Tesseract. Inspired
 - [Example](#example)
 
 # Prerequisites
-* [OCR engine Tesseract](https://github.com/tesseract-ocr/tessdoc/blob/master/Home.md)
+* [Tesseract](https://github.com/tesseract-ocr/tessdoc/blob/master/Home.md)
 * [patool](https://github.com/wummel/patool)
 * [opencv-python](https://pypi.org/project/opencv-python/)
 
@@ -37,6 +37,10 @@ optional arguments:
   --output-path OUTPUT_PATH
                         Path to write the comic scripts to.
   --config CONFIG       Configurations.
+```
+E.g.,
+```
+comicsocr --path <path_to_comic> --output-path <path_to_csv> --config="{'method': 'simple'}"
 ```
 **Configurations**
 ```
@@ -69,4 +73,4 @@ class Config(builtins.object)
  |          Default to {'height': 768}.
 ```
 # Example
-Example use case can be found [here](https://largecats.github.io/2019/06/20/ocr-with-comics/).
+See [here](https://largecats.github.io/2019/06/20/ocr-with-comics/) for example use case (using a simplified version of the tool).
