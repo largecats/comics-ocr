@@ -33,7 +33,7 @@ class Config:
             Default to Config.SIMPLE.
         show: boolean
             If True, will show the image being processed with recognized contours.
-            Note: This feature may require special handling on unix systems.
+            Note: May not be available in Python's interactive terminal and may require special handling to show on Unix systems.
             Default to False.
         showWindowSize: dict
             Size of the window when displaying the image being processed. 

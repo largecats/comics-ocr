@@ -11,6 +11,8 @@ Tool for extracting script from comic pages using OCR engine Tesseract. Inspired
 - [Installation](#installation)
 - [Compatibility](#compatibility)
 - [Usage](#usage)
+  - [Using as command-line tool](#using-as-command-line-tool)
+  - [Using as Python library](#using-as-python-library)
   - [Configurations](#configurations)
 
 # Prerequisites
@@ -29,6 +31,8 @@ Supports Python 2.7 and 3.6+.
 
 
 # Usage
+See [here](https://largecats.github.io/2019/06/20/ocr-with-comics/) for more detailed example (using a simplified version of the tool).
+## Using as command-line tool
 ```
 usage: comicsocr [-h] [--paths PATHS [PATHS ...]] [--output-path OUTPUT_PATH] [--config CONFIG]
 
@@ -55,7 +59,24 @@ E.g.,
 [2020-07-20 22:48:10,287] INFO [reader.py:72:read] 'Pinto d 3 ABO adieSoa an eee'
 [2020-07-20 22:48:10,288] INFO [api.py:74:write_to_file] Writing to: C:\Users\largecats\Fun\programming\personal-projects\comics-ocr\test\result.txt
 ```
-See [here](https://largecats.github.io/2019/06/20/ocr-with-comics/) for more detailed example (using a simplified version of the tool).
+
+## Using as Python library
+Call `api.read_from_file`, `api.read_from_archive_file`, or `api.read_from_directory` to read from a single image file, a single archive file, or a directory containing image files or archive files of images.
+
+E.g.,
+```
+>>> from comicsocr import api
+>>> api.read_from_file(imagePath=r'C:\Users\largecats\Fun\programming\personal-projects\comics-ocr\test\test.jpg')
+[2020-07-20 23:15:35,071] INFO [api.py:54:read_from_file] Reading from file: C:\Users\largecats\Fun\programming\personal-projects\comics-ocr\test\test.jpg
+[2020-07-20 23:15:36,128] INFO [reader.py:72:read] 'a ela a'
+[2020-07-20 23:15:39,436] INFO [reader.py:72:read] 'THE LAW GAYS THISSORT OF THING HAS TOBE DECLARED ON-SITE.FORMALITIES.'
+[2020-07-20 23:15:41,286] INFO [reader.py:72:read] "I DON'T UNDERSTAND WHYWE HAVE TO BE HERE. CAN'TWE FUST... PUSH A BUTTONAND BE DONE VUITH IT?"
+[2020-07-20 23:15:42,058] INFO [reader.py:72:read] 'MINING OUTPOST C-12.'
+[2020-07-20 23:15:42,867] INFO [reader.py:72:read] 'LONG AGO. PEACETIME.'
+[2020-07-20 23:15:43,761] INFO [reader.py:72:read] 'THE CYBERTRON SYSTEM.Zs'
+[2020-07-20 23:15:47,045] INFO [reader.py:72:read] 'Pinto d 3 ABO adieSoa an eee'
+['a ela a', 'THE LAW GAYS THISSORT OF THING HAS TOBE DECLARED ON-SITE.FORMALITIES.', "I DON'T UNDERSTAND WHYWE HAVE TO BE HERE. CAN'TWE FUST... PUSH A BUTTONAND BE DONE VUITH IT?", 'MINING OUTPOST C-12.', 'LONG AGO. PEACETIME.', 'THE CYBERTRON SYSTEM.Zs', 'Pinto d 3 ABO adieSoa an eee']
+```
 
 ## Configurations
 ```
