@@ -81,7 +81,11 @@ def get_arguments(argv):
     parser.add_argument('--paths',
                         type=str,
                         nargs='+',
-                        help='Paths to comic image files or directorys containing comic image files.')
+                        help='''
+                        Paths to comic image files, archive files or directories containing comic image files. 
+                        Supported file formats (windows and unix): .jpg, .png, .bmp, .tiff.
+                        Supported archive file formats (unix only): .rar, .cbr, .zip.
+                        ''')
 
     parser.add_argument('--output-path', type=str, help='Path to write the comic scripts to.')
 
