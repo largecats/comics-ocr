@@ -62,8 +62,8 @@ def get_arguments(argv):
                         nargs='+',
                         help='''
                         Paths to comic image files, archive files or directories containing comic image files. 
-                        Supported file formats (windows and unix): .jpg, .png, .bmp, .tiff.
-                        Supported archive file formats (unix only): .rar, .cbr, .zip.
+                        Supported file formats (Windows and Unix): .jpg, .png, .bmp, .tiff.
+                        Supported archive file formats (Unix only): .rar, .cbr, .zip.
                         ''')
 
     parser.add_argument('--output-path',
