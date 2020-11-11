@@ -28,7 +28,7 @@ Supports Python 2.7 and 3.6+.
 
 
 # Usage
-See [here](https://largecats.github.io/2019/06/20/ocr-with-comics/) for more detailed example (using a simplified version of the tool).
+See [here](https://largecats.github.io/blog/2019/06/20/ocr-with-comics/) for more detailed example (using a simplified version of the tool).
 ## Using as command-line tool
 ```
 usage: comicsocr [-h] [--paths PATHS [PATHS ...]] [--output-path OUTPUT_PATH] [--config CONFIG]
